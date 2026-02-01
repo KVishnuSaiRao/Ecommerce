@@ -51,22 +51,24 @@ export default function CheckoutPage() {
     setStatus(null);
 
     try {
-      const res = await fetch("http://localhost:4000/admin/generate-code", {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
+      const res = await fetch(`${apiUrl}/admin/generate-code`, {
         method: "POST",
+        headers: { "Content-Type": "application/json" },
       });
       const data = await res.json();
       setHasChecked(true); 
 
-      if (data.code) {
+      if (res.ok && data.code) {
         setDiscountCode(data.code);
         setStatus({ 
             type: "success", 
-            msg: `This is your #3rd Order. This is the 3rd Order! 10% Discount applied.`
+            msg: `This is your #3rd Order! 10% Discount applied.`
         });
       } else {
         setStatus({ 
             type: "error", 
-            msg: `No discount available. Only ${data.orders_until_next_discount-1} more order(s) until the next win!` 
+            msg: data.message || `No discount available. Only ${data.orders_until_next_discount - 1} more order(s) until the next win!` 
         });
       }
     } catch (e) {
@@ -81,6 +83,8 @@ export default function CheckoutPage() {
     if (cartItems.length === 0) return;
     setLoading(true);
 
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
+
     const payload = {
       userId: "guest-user-123",
       discountCode: discountCode,
@@ -91,15 +95,7 @@ export default function CheckoutPage() {
     };
 
     try {
-       for (const item of cartItems) {
-         await fetch("http://localhost:4000/cart/add", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ userId: payload.userId, itemId: item.id, price: item.price })
-         });
-       }
-
-       const res = await fetch("http://localhost:4000/checkout", {
+      const res = await fetch(`${apiUrl}/checkout`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ userId: payload.userId, discountCode: payload.discountCode }),
@@ -118,7 +114,8 @@ export default function CheckoutPage() {
       setTimeout(() => router.push("/"), 4000);
 
     } catch (err: any) {
-      setStatus({ type: "error", msg: err.message });
+      console.error("Checkout Error:", err);
+      setStatus({ type: "error", msg: err.message || "Failed to connect to server." });
     } finally {
       setLoading(false);
     }

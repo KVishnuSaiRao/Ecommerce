@@ -18,7 +18,8 @@ export default function ProductDetails({ productId }: { productId: string }) {
     const fetchProduct = async () => {
       try {
         setLoading(true);
-        const res = await fetch(`http://localhost:4000/products/${productId}`);
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
+        const res = await fetch(`${apiUrl}/products/${productId}`);
         
         if (!res.ok) {
           throw new Error("Product not found");
@@ -27,8 +28,8 @@ export default function ProductDetails({ productId }: { productId: string }) {
         const data = await res.json();
         setProduct(data);
       } catch (err) {
-        console.error(err);
-        setError("Failed to load product");
+        console.error("Fetch Product Error:", err);
+        setError("Failed to load product details.");
       } finally {
         setLoading(false);
       }
