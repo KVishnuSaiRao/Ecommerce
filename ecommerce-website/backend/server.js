@@ -4,9 +4,13 @@ const cors = require('cors'); // Allows Frontend to talk to Backend
 const controller = require('./controller');
 
 const app = express();
-const PORT = 4000;
+const PORT = process.env.PORT || 4000;
 
-app.use(cors());
+app.use(cors({
+    origin: process.env.FRONTEND_URL || '*', 
+    methods: ['GET', 'POST']
+}));
+
 app.use(bodyParser.json());
 
 
@@ -51,11 +55,7 @@ app.post('/admin/generate-code', (req, res) => {
     res.json(controller.generateDiscountCode());
 });
 
-// // 6. Admin: Stats
-// app.get('/admin/stats', (req, res) => {
-//     res.json(controller.getStats());
-// });
-
-app.listen(PORT, () => {
-    console.log(`Backend Server running on http://localhost:${PORT}`);
+// 3. Listen on 0.0.0.0 for external access
+app.listen(PORT, '0.0.0.0', () => {
+    console.log(`Server running on port ${PORT}`);
 });
