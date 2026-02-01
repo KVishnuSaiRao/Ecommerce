@@ -2,6 +2,8 @@
 
 A modern, responsive E-Commerce application built with **Next.js 14**, **TypeScript**, and **Tailwind CSS**. This project features a robust product catalog with infinite scrolling, a dynamic cart system, and a gamified "Lucky 3rd Customer" checkout experience.
 
+🔗 Live Demo: https://kvsr-ecommerce.vercel.app/
+
 ## ✨ Features
 
 ### 🛒 Product Catalog
